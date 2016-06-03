@@ -42,7 +42,7 @@ class  Poset(object):
         return None
 
     def index(self,obj):
-        return self.o.values().index(obj)
+        return list(self.o.values()).index(obj)
 
     def get(self,obj):
         return self.o.get(obj,None)
@@ -55,10 +55,10 @@ class  Poset(object):
 
     def __iter__(self):
         try:
-            for obj in self.o.values():
+            for obj in list(self.o.values()):
                 yield obj
         except:
-            for obj in self.o.values():
+            for obj in list(self.o.values()):
                 yield obj
 
     def __cmp__(self,other):
@@ -77,12 +77,12 @@ class  Poset(object):
         return s1!=s2
 
     def copy(self):
-        return Poset(self.o.values())
+        return Poset(list(self.o.values()))
 
     __copy__ = copy
     def deepcopy(self):
         from copy import deepcopy
-        L = deepcopy(self.o.values())
+        L = deepcopy(list(self.o.values()))
         return Poset(L)
 
     def __or__(self,other):
@@ -134,7 +134,7 @@ class  Poset(object):
         return (obj in self.o)
 
     def contains__cmp__(self,obj):
-        return (obj in self.o.values())
+        return (obj in list(self.o.values()))
 
     def issubset(self,other):
         s1 = set(self.o.values())

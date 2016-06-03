@@ -4,7 +4,7 @@
 # Copyright (C) 2008 Axel Tillequin (bdcht3@gmail.com) and others
 # published under GPLv2 license or EPLv1 license
 # Contributor(s): Axel Tillequin, Fabio Zadrozny
-from __future__ import absolute_import
+
 
 from .poset import *
 from .dot import *
@@ -29,7 +29,7 @@ except NameError:
 #  a random normalized n-dimension vector orthogonal to (1,1,1,...,1).
 def  rand_ortho1(n):
     r = SystemRandom()
-    pos = [r.random() for x in xrange(n)]
+    pos = [r.random() for x in range(n)]
     s = sum(pos)
     v = array(pos,dtype=float)-(s/float(n))
     norm = sqrt(sum(v*v))
@@ -135,7 +135,7 @@ def setcurve(e,pts,tgs=None):
     else:
       Q,T = tangents(P,n)
     splines=[]
-    for k in xrange(n-1):
+    for k in range(n-1):
         t = T[k]+T[k+1]
         a = 16. - (t.dot(t))
         b = 12.*(Q[k].dot(t))
@@ -158,7 +158,7 @@ def tangents(P,n):
     assert n>=2
     Q = []
     T = []
-    for k in xrange(0,n-1):
+    for k in range(0,n-1):
         q = P[k+1]-P[k]
         t = q/sqrt(q.dot(q))
         Q.append(q)

@@ -52,7 +52,7 @@ class Dot:
                 try:
                     float(v)
                 except ValueError:
-                    print('invalid numeral token: %s'%v)
+                    print(('invalid numeral token: %s'%v))
                     raise SyntaxError
             elif '.' in v: # forbidden in non-numeric
                 raise SyntaxError
@@ -96,7 +96,7 @@ class Dot:
             return t
 
         def t_ANY_error(self,t):
-            print("Illegal character '%s'" % t.value[0])
+            print(("Illegal character '%s'" % t.value[0]))
             t.lexer.skip(1)
 
         def build(self,**kargs):
@@ -157,7 +157,7 @@ class Dot:
                                 self.nodes[n.name] = n
 
         def __repr__(self):
-            u = u'<%s instance at %x, name: %s, %d nodes>'%(
+            u = '<%s instance at %x, name: %s, %d nodes>'%(
                    self.__class__,
                    id(self),
                    self.name,
@@ -366,7 +366,7 @@ class Dot:
             p[0] = "%s:%s"%(p[1],p[2])
 
         def p_error(self,p):
-            print('Syntax Error: %s' % (p,))
+            print(('Syntax Error: %s' % (p,)))
             self._parser.restart()
 
         def build(self,**kargs):

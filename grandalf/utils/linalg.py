@@ -1,9 +1,10 @@
 import sys
 from math import sqrt
 from array import array as _array
+from functools import reduce
 
 if sys.version_info < (3,):
-    from itertools import izip
+    
 
 
 def coerce_(types):
@@ -11,7 +12,7 @@ def coerce_(types):
     if str in types: raise TypeError
     if complex in types: raise TypeError
     dtype = ('i',int)
-    if long in types: dtype = ('l',long)
+    if int in types: dtype = ('l',int)
     if float in types: dtype = ('d',float)
     return dtype
 
@@ -34,11 +35,11 @@ def make_ij_slices(f):
     return wrapper
 
 if sys.version_info < (3,):
-    constants = (int,long,float)
+    constants = (int,int,float)
 
 else:
     long = int
-    constants = (int, long, float)
+    constants = (int, int, float)
 # minimalistic numpy.array replacement class used as fallback
 # when numpy is not found in geometry module
 class array(object):
@@ -144,7 +145,7 @@ class array(object):
         for x in self.data: yield x
 
     def __setitem__(self,i,v):
-        assert isinstance(i,(int,long))
+        assert isinstance(i,int)
         self.data[i] = self.dtype(v)
 
     def __getitem__(self,i):
@@ -174,7 +175,7 @@ class matrix(object):
         if t in constants:
             self.data = [array(data,dtype,copy)]
         else:
-            if transpose: data = zip(*data)
+            if transpose: data = list(zip(*data))
             self.data = [array(v,dtype,copy) for v in data]
         # define matrix sizes:
         self.n = len(self.data)
@@ -224,8 +225,8 @@ class matrix(object):
     @make_ij_slices
     def __setitem__(self,ij,v):
         I,J = ij
-        Ri =range(I.start,I.stop,I.step)
-        Rj =range(J.start,J.stop,J.step)
+        Ri =list(range(I.start,I.stop,I.step))
+        Rj =list(range(J.start,J.stop,J.step))
         if type(v) in constants: v = (v,)
         value = (x for x in v)
         for i in Ri:

@@ -23,10 +23,9 @@ try:
 except NameError:
     xrange = range
 
-try:
-    from itertools import izip
-except ImportError:
-    izip = zip
+# try:   
+# except ImportError:
+izip = zip
 
 # the VertexViewer class is used as the default class
 # for providing the Vertex dimensions (w,h) and position (xy)
@@ -239,7 +238,7 @@ class Layer(list):
         for i,p in enumerate(P):
             candidates = sum(P[i+1:],[])
             for j,e in enumerate(p):
-                p[j] = len(filter((lambda nx:nx<e), candidates))
+                p[j] = len(list(filter((lambda nx:nx<e), candidates)))
             del candidates
         return P
 
@@ -264,7 +263,7 @@ class Layer(list):
         g = self.layout.grx
         N = len(self)
         X=0
-        for i,j in izip(xrange(N-1),xrange(1,N)):
+        for i,j in zip(range(N-1),range(1,N)):
             vi = self[i]
             vj = self[j]
             ni = [g[v].pos for v in self._neighbors(vi)]
@@ -319,10 +318,10 @@ class  SugiyamaLayout(object):
         # For layered sugiyama algorithm, the input graph must be acyclic,
         # so we must provide a list of root nodes and a list of inverted edges.
         if roots==None:
-            roots = list(filter(lambda x: len(x.e_in())==0, self.g.sV))
+            roots = list([x for x in self.g.sV if len(x.e_in())==0])
         if inverted_edges==None:
             L = self.g.get_scs_with_feedback(roots)
-            inverted_edges = list(filter(lambda x:x.feedback, self.g.sE))
+            inverted_edges = list([x for x in self.g.sE if x.feedback])
         self.alt_e = inverted_edges
         # assign rank to all vertices:
         self.rank_all(roots,optimize)
@@ -395,7 +394,7 @@ class  SugiyamaLayout(object):
     # optimal ranking may be derived from network flow (simplex).
     def rank_all(self,roots,optimize=False):
         self._edge_inverter()
-        r = list(filter(lambda x: len(x.e_in())==0 and x not in roots, self.g.sV))
+        r = list([x for x in self.g.sV if len(x.e_in())==0 and x not in roots])
         self._rank_init(roots+r)
         if optimize: self._rank_optimize()
         self._edge_inverter()
@@ -467,7 +466,7 @@ class  SugiyamaLayout(object):
             ctrl=self.ctrls[e]={}
             ctrl[r0]=[v0]
             ctrl[r1]=[v1]
-            for r in xrange(r0+1,r1):
+            for r in range(r0+1,r1):
                 self.dummyctrl(r,ctrl)
             if e in self.alt_e and with_constraint:
                 dv0 = self.dummyctrl(r0,ctrl)
@@ -533,7 +532,7 @@ class  SugiyamaLayout(object):
                 self.grx[v].X     = None
                 self.grx[v].x     = [0.0]*4
         curvh = self.dirvh # save current dirvh value
-        for dirvh in xrange(4):
+        for dirvh in range(4):
             self.dirvh = dirvh
             self._coord_vertical_alignment()
             self._coord_horizontal_compact()
@@ -690,23 +689,23 @@ class  SugiyamaLayout(object):
                     D = self.ctrls[e]
                     r0,r1 = self.grx[e.v[0]].rank,self.grx[e.v[1]].rank
                     if r0<r1:
-                        ranks = xrange(r0+1,r1)
+                        ranks = range(r0+1,r1)
                     else:
                         if self.ctrls['cons']:
-                            ranks = xrange(r0,r1-1,-1)
+                            ranks = range(r0,r1-1,-1)
                         else:
-                            ranks = xrange(r0-1,r1,-1)
+                            ranks = range(r0-1,r1,-1)
                     l = [D[r][-1].view.xy for r in ranks]
                 l.insert(0,e.v[0].view.xy)
                 l.append(e.v[1].view.xy)
                 if self.ctrls['cons'] and r0>r1:
                     dy = e.v[0].view.h/2. + self.yspace/3.
-                    x,y = zip(l[0],l[1])
+                    x,y = list(zip(l[0],l[1]))
                     y = max(y)+dy
                     l.insert(1,(x[0],y))
                     l.insert(2,(x[1],y))
                     dy = e.v[1].view.h/2. + self.yspace/3.
-                    x,y = zip(l[-1],l[-2])
+                    x,y = list(zip(l[-1],l[-2]))
                     y = min(y)-dy
                     l.insert(-1,(x[0],y))
                     l.insert(-2,(x[1],y))
@@ -757,7 +756,7 @@ class  DigcoLayout(object):
         self.draw_edges()
 
     def draw_step(self):
-        for x in xrange(self._cv_max_iter):
+        for x in range(self._cv_max_iter):
             self.draw(N=1)
             self.draw_edges()
             yield
@@ -782,7 +781,7 @@ class  DigcoLayout(object):
         sorted(ordering, reverse=True)
         l = []
         self.levels.append(l)
-        for i in xrange(len(list(ordering))-1):
+        for i in range(len(list(ordering))-1):
             y,v = ordering[i]
             l.append(v)
             v.level = self.levels.index(l)
@@ -819,7 +818,7 @@ class  DigcoLayout(object):
         r = b - self.__L_pk(Lii,y)
         p = array(r,copy=True)
         rr = sum(r*r)
-        for k in xrange(self._cg_max_iter):
+        for k in range(self._cg_max_iter):
             try:
                 Lp = self.__L_pk(Lii,p)
                 alpha = rr/sum(p*Lp)
@@ -875,7 +874,7 @@ class  DigcoLayout(object):
         r = b - Lw*z
         p = r.copy()
         rr = scal(r,r)
-        for k in xrange(self._cg_max_iter):
+        for k in range(self._cg_max_iter):
             if rr<self._cg_tolerance: break
             Lp = Lw*p
             alpha = rr/scal(p,Lp)
@@ -902,9 +901,9 @@ class  DigcoLayout(object):
         self.Dij = self.__Dij_()  # we keep D also for L^Z computations
         Lij = self.Dij.copy()
         n = self.g.order()
-        for i in xrange(n):
+        for i in range(n):
             d = 0
-            for j in xrange(n):
+            for j in range(n):
                 if j==i: continue
                 Lij[i,j] = 1.0/self.Dij[i,j]**2
                 d += Lij[i,j]
@@ -918,8 +917,8 @@ class  DigcoLayout(object):
         lzz = Z.copy()*0.0 # lzz has dim Z (n x 2)
         liz = matrix([0.0]*n) # liz is a row of L^Z (size n)
         # compute lzz = L^Z.Z while assembling L^Z by row (liz):
-        for i in xrange(n):
-            iterk_except_i = (k for k in xrange(n) if k!=i)
+        for i in range(n):
+            iterk_except_i = (k for k in range(n) if k!=i)
             for k in iterk_except_i:
                 v = Z[i]-Z[k]
                 liz[0,k] = 1.0/(self.Dij[i,k]*sqrt(v*v.transpose()))
@@ -938,9 +937,9 @@ class  DigcoLayout(object):
         b  = self.__Lij_Z_Z(Z)
         while count<limit:
             if self.debug:
-                print("count %d"%count)
-                print("Z = ",Z)
-                print("b = ",b)
+                print(("count %d"%count))
+                print(("Z = ",Z))
+                print(("b = ",b))
             # find next Z by solving Lw.Z = b in every direction:
             x,xerr = self._cg_Lw(Lw[1:,1:],Z[1:,0],b[1:,0])
             y,yerr = self._cg_Lw(Lw[1:,1:],Z[1:,1],b[1:,1])
@@ -948,7 +947,7 @@ class  DigcoLayout(object):
             Z[1:,1] = y
             if self.debug:
                 print(" cg -> ")
-                print(Z,xerr,yerr)
+                print((Z,xerr,yerr))
             # compute new stress:
             FZ = K-float(x.transpose()*b[1:,0] + y.transpose()*b[1:,1])
             # precompute new b:
@@ -956,7 +955,7 @@ class  DigcoLayout(object):
             # update new stress:
             FZ += 2*float(x.transpose()*b[1:,0] + y.transpose()*b[1:,1])
             # test convergence:
-            print('stress=%.10f'%FZ)
+            print(('stress=%.10f'%FZ))
             if stress==0.0 : break
             elif abs((stress-FZ)/stress)<self._eps:
                 if deep==2:

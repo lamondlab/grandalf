@@ -185,10 +185,10 @@ class  graph_core(object):
                 v.c = self
 
     def roots(self):
-        return list(filter(lambda v:len(v.e_in())==0, self.sV))
+        return list([v for v in self.sV if len(v.e_in())==0])
 
     def leaves(self):
-        return list(filter(lambda v:len(v.e_out())==0, self.sV))
+        return list([v for v in self.sV if len(v.e_out())==0])
 
     # allow a graph_core to hold a single vertex:
     def add_single_vertex(self,v):
