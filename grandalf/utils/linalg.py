@@ -4,7 +4,7 @@ from array import array as _array
 from functools import reduce
 
 if sys.version_info < (3,):
-    
+    raise Exception()    
 
 
 def coerce_(types):
